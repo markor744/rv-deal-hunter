@@ -271,7 +271,7 @@ What it found and fixed so far:
 
 ```
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest -q                 # 57 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
+.venv/bin/python -m pytest -q                 # 60 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
 .venv/bin/python -m rvdeals.main fixtures     # practice run; plan pages land in .practice/docs
 DRY_RUN=1 .venv/bin/python -m rvdeals.main check   # real sites, prints texts instead of sending
 ```

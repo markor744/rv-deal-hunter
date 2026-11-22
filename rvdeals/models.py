@@ -1,6 +1,7 @@
 """The Deal record every source produces. Missing values are NOT_LISTED, never guessed."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field, asdict
 from datetime import date
 from typing import Optional
@@ -56,3 +57,10 @@ class Deal:
             if isinstance(v, float) and v == float("inf"):
                 d[k] = "unlimited"
         return d
+
+    def __post_init__(self):
+        # deal_id and link come from scraped pages. deal_id becomes a file name and part of a URL,
+        # so keep only safe characters; link goes into href=, so allow only web addresses.
+        self.deal_id = re.sub(r"[^A-Za-z0-9._-]", "-", str(self.deal_id)).lstrip(".-") or "deal"
+        if not re.match(r"^https?://", str(self.link or ""), re.I):
+            self.link = ""

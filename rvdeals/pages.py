@@ -33,6 +33,12 @@ def _e(s) -> str:
     return html.escape(str(s))
 
 
+def _href(url) -> str:
+    """Only web addresses go into a link; anything else (e.g. javascript:) becomes a dead link."""
+    u = str(url or "").strip()
+    return u if re.match(r"^https?://", u, re.I) else "#"
+
+
 def _sym(cur: str) -> str:
     if cur == "USD":
         return "US$"
@@ -419,7 +425,7 @@ def _fine_print(deal: Deal, today: date) -> str:
                 + "".join(f'<span class="pill">{_e(m)}</span>' for m in missing)
                 + '</div><p class="small" style="margin:8px 0 0">Ask before you book. This tool never guesses these.</p></div>')
     return (f'<h2>Details</h2><div class="card"><dl>{shown}</dl>'
-            f'<p style="margin:14px 0 0"><a href="{_e(deal.link)}">Original listing on {_e(deal.company)}</a></p></div>{miss}'
+            f'<p style="margin:14px 0 0"><a href="{_e(_href(deal.link))}">Original listing on {_e(deal.company)}</a></p></div>{miss}'
             f'<p class="small">Driving times, distances and campgrounds are approximate starting points. '
             f'Road closures, seasons, hours and reservations change: {CHECK}.</p>')
 
@@ -445,7 +451,7 @@ def _book(deal: Deal, label_prefix: str = "") -> str:
     if deal.booking.startswith("phone"):
         num = deal.booking.split(": ", 1)[1]
         return f'<a class="btn primary" href="tel:{_e(num)}">{label_prefix}Call {_e(num)} to book</a>'
-    return (f'<a class="btn primary" href="{_e(deal.link)}">{label_prefix}Book the RV on '
+    return (f'<a class="btn primary" href="{_e(_href(deal.link))}">{label_prefix}Book the RV on '
             f'{_e(deal.company.split(" + ")[0])}</a>')
 
 
@@ -772,7 +778,10 @@ def _new_tab(html_: str) -> str:
 
 
 def write_plan(docs: Path, deal: Deal, sc: Score | None, today: date, cfg: dict | None = None) -> Path:
+    base = (Path(docs) / "p").resolve()
     p = Path(docs) / "p" / f"{deal.deal_id}.html"
+    if p.resolve().parent != base:
+        raise ValueError("unsafe deal id")
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(_new_tab(render_plan(deal, sc, today, cfg)))
     return p
