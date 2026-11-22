@@ -1,0 +1,130 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="color-scheme" content="light dark"><title>Elkhart to Seattle</title><style>
+:root{--bg:#f4f2ec;--surface:#fff;--ink:#1b1b19;--mute:#6b6860;--line:#e4e0d6;--accent:#1d6b57;--accent-ink:#fff;
+--great:#1d7a4f;--ok:#a86a00;--weak:#8a8780;--bad:#b3412e;--soft:#eef5f1;--warnbg:#fdf3e1;--warn:#7f5200;--r:14px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--surface:#1c1c1a;--ink:#edece7;--mute:#a3a097;--line:#302f2c;
+--accent:#5fc6a5;--accent-ink:#0b1d17;--great:#5fc6a5;--ok:#e7b04f;--weak:#8f8c84;--bad:#ef8a75;--soft:#16241f;--warnbg:#2a2215;--warn:#f0c27a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121211;--surface:#1c1c1a;--ink:#edece7;--mute:#a3a097;--line:#302f2c;
+--accent:#5fc6a5;--accent-ink:#0b1d17;--great:#5fc6a5;--ok:#e7b04f;--weak:#8f8c84;--bad:#ef8a75;--soft:#16241f;--warnbg:#2a2215;--warn:#f0c27a;color-scheme:dark}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}main{max-width:680px;margin:0 auto;padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;justify-content:space-between;align-items:center;padding:14px 0 6px;font-size:.9rem;color:var(--mute)}
+.top a{text-decoration:none;font-weight:600}
+h1{font-size:1.65rem;line-height:1.2;margin:6px 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:12px 0}
+.verdict{display:flex;gap:14px;align-items:center}
+.ring{--p:0;--c:var(--great);flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;
+background:conic-gradient(var(--c) calc(var(--p)*1%),var(--line) 0)}
+.ring b{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:var(--surface);font-size:1.3rem}
+.great{--c:var(--great);color:var(--great)}.ok{--c:var(--ok);color:var(--ok)}.weak{--c:var(--weak);color:var(--weak)}
+.vlabel{font-size:1.15rem;font-weight:700}.vsub{color:var(--mute);font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{background:var(--bg);border-radius:10px;padding:10px 8px;text-align:center}
+.stat strong{display:block;font-size:1.1rem}.stat span{color:var(--mute);font-size:.78rem}
+.actions{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:14px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;font-weight:700;text-decoration:none;
+padding:0 14px;text-align:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}.btn.secondary{border:1px solid var(--line);color:var(--ink);background:var(--surface)}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;padding:8px 0;margin:8px 0 0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button,.seg button{font:inherit;border:0;background:none;color:var(--mute);padding:9px 13px;border-radius:999px;white-space:nowrap;cursor:pointer;min-height:40px}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg);font-weight:600}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin:12px 0}
+.seg button{flex:1;border-radius:9px;font-size:.92rem}.seg button[aria-selected=true]{background:var(--soft);color:var(--accent);font-weight:700}
+h2{font-size:1.05rem;margin:22px 0 8px}
+.list{list-style:none;padding:0;margin:0}.list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.dot{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:800;margin-top:1px}
+.dot.good{background:var(--soft);color:var(--great)}.dot.ok{background:var(--warnbg);color:var(--ok)}
+.dot.bad{background:var(--warnbg);color:var(--bad)}.dot.unknown{background:var(--bg);color:var(--mute)}
+.note{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:.93rem}
+.summary{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:600;background:var(--bg);color:var(--mute);margin:2px 4px 2px 0}
+.pill.good{background:var(--soft);color:var(--great)}.pill.bad{background:var(--warnbg);color:var(--bad)}
+.tl{list-style:none;padding:0;margin:8px 0 0;position:relative}
+.tl>li{position:relative;padding:0 0 18px 28px}
+.tl>li:before{content:"";position:absolute;left:8px;top:8px;bottom:-8px;width:2px;background:var(--line)}
+.tl>li:last-child:before{display:none}
+.tl>li:after{content:"";position:absolute;left:3px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+.day{font-size:.78rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.leg{font-weight:700;margin:1px 0 4px}.stops{margin:6px 0;padding-left:18px}.stops li{margin:2px 0}
+.camp{font-size:.9rem;color:var(--mute)}.small{font-size:.88rem;color:var(--mute)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+summary{cursor:pointer;font-weight:600}details ul{margin:8px 0 0;padding-left:18px}details li{margin:6px 0;font-size:.93rem}
+table{width:100%;border-collapse:collapse}td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}td:last-child{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;padding-left:10px}tr.total td{font-weight:800;border-bottom:0;font-size:1.05rem}
+.minus{color:var(--great)}.na{color:var(--mute);font-style:italic}
+dl{margin:0}dt{color:var(--mute);font-size:.82rem;margin-top:10px}dd{margin:2px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.dealcard{display:block;color:inherit;text-decoration:none}.dealcard .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.score{flex:none;min-width:46px;text-align:center;border-radius:10px;padding:4px 6px;font-weight:800}
+.score.great{background:var(--soft)}.score.ok{background:var(--warnbg)}.score.weak{background:var(--bg)}
+.empty{text-align:center;color:var(--mute);padding:28px 10px}
+footer{color:var(--mute);font-size:.82rem;margin-top:28px}
+.js [role=tabpanel][hidden]{display:none}
+
+body{font-size:17px}h1 .arrow{color:var(--mute);font-weight:500}
+.answer{padding:18px}.trip{list-style:none;padding:0;margin:14px 0 0;border-top:1px solid var(--line)}
+.trip li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.trip li:last-child{border-bottom:0;padding-bottom:0}
+.trip .ic{flex:none;width:36px;height:36px;border-radius:10px;background:var(--soft);color:var(--accent);display:grid;place-items:center}.trip .k{font-size:.78rem;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.trip .v{font-weight:650;font-size:1.02rem}.trip .s,.steps .s{font-size:.85rem;color:var(--mute)}
+h2.h{margin-top:22px}.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:10px 0}
+.steps .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:800}
+.steps .sb{flex:1;min-width:0}.steps .st{font-weight:700;margin-bottom:8px}.steps .btn{width:100%;min-height:52px;font-size:1rem}
+.steps .s{margin-top:6px}.bring{margin:8px 0 0;padding-left:20px}.bring li{margin:6px 0}
+tr.sub td{font-weight:700;border-bottom:0;color:var(--ink)}.cost{font-weight:650;margin:3px 0}
+.best{border:2px solid var(--accent)}.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.sleep{margin:8px 0 4px;background:var(--bg);border-radius:10px;padding:8px 10px;display:grid;gap:5px}
+.sleep .sl{font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}
+.opt{display:flex;gap:8px;align-items:baseline;font-size:.9rem}
+.tag{flex:none;font-size:.68rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:1px 6px}
+.tag.paid{background:var(--surface);color:var(--mute);border:1px solid var(--line)}.tag.free{background:var(--soft);color:var(--great)}
+.topr{display:flex;align-items:center;gap:8px}.gear{display:grid;place-items:center;width:44px;height:44px;margin:-8px -10px -8px 0;border:0;border-radius:50%;background:transparent;color:var(--ink);cursor:pointer}
+.gear:hover,.gear[aria-expanded=true]{background:var(--surface)}.gear:focus-visible,.close:focus-visible{outline:3px solid var(--accent)}
+.settings h2{margin:0}.settings h3{font-size:.95rem;margin:16px 0 4px}.settings p{margin:0}.set-top{display:flex;justify-content:space-between;align-items:center}
+.set-q{font-size:.85rem;color:var(--mute);margin-top:12px}.close{width:40px;height:40px;border:0;border-radius:50%;background:var(--bg);color:var(--ink);font-size:1.4rem;cursor:pointer}
+.settings .seg{margin:6px 0 0}.settings .seg button[aria-pressed=true]{background:var(--soft);color:var(--accent);font-weight:700}
+.why{font-size:.85rem;color:var(--bad);margin-top:2px}
+.legc{display:block;font-size:.88rem;color:var(--mute);margin:2px 0}.bigcost{font-size:1.1rem;font-weight:700;margin:12px 0 4px}
+</style></head><body><main><div class="top"><a href="../">&larr; All deals</a><span>Imoova</span></div><h1>Elkhart <span class="arrow">&rarr;</span> Seattle</h1><p class="sub">Comfort Family Select &middot; sleeps 7</p><div class="card answer"><div class="verdict"><div class="ring weak" style="--p:30"><b>30</b></div><div><div class="vlabel weak">Weak deal</div><div class="vsub" data-cost='{&quot;rv&quot;:147.66,&quot;tl&quot;:265,&quot;th&quot;:455,&quot;fuel&quot;:1618.4,&quot;n&quot;:8,&quot;cpn&quot;:35.0,&quot;dc&quot;:&quot;free&quot;,&quot;dp&quot;:2,&quot;paid&quot;:{&quot;campgrounds&quot;:8,&quot;mix&quot;:4,&quot;free&quot;:2}}'>8 nights, about <span class="ai" data-f="allin">$2,370-2,750</span> all-in</div></div></div><ul class="trip" data-cost='{&quot;rv&quot;:147.66,&quot;tl&quot;:265,&quot;th&quot;:455,&quot;fuel&quot;:1618.4,&quot;n&quot;:8,&quot;cpn&quot;:35.0,&quot;dc&quot;:&quot;free&quot;,&quot;dp&quot;:2,&quot;paid&quot;:{&quot;campgrounds&quot;:8,&quot;mix&quot;:4,&quot;free&quot;:2}}'><li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><div><div class="k">When</div><div class="v">Pick up Apr 1 to Apr 24</div><div class="s">153 days left to pick up</div></div></li><li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><div><div class="k">Getting there</div><div class="v">Flight YVR to SBN, $260-460 each</div><div class="s">about 4.25 h &middot; around Apr 1 &middot; typical for April &middot; <span class="ai" data-f="legline">$530-910 for 2</span> &middot; real prices in step 2</div></div></li><li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V7a2 2 0 0 1 2-2h10l6 6v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6M15 5v6h6"/></svg></span><div><div class="k">The RV</div><div class="v">US$107 for 8 nights</div><div class="s">booking fee included</div></div></li><li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.8 3 2 3 .9 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></svg></span><div><div class="k">All-in</div><div class="v">about <span class="ai" data-f="allin">$2,370-2,750</span></div><div class="s"><span class="ai" data-f="pernight">$300-340</span> a night &middot; <span class="ai" data-f="style">Mostly free</span> &middot; <span class="ai" data-f="people">2 people</span></div></div></li></ul></div><h2 class="h">Grab it in 2 steps</h2><ol class="steps"><li><div class="n">1</div><div class="sb"><div class="st">Book the RV</div><a class="btn primary" target="_blank" rel="noopener" href="https://www.imoova.com/relocations/usa/elkhart-to-seattle/RLC130667">Book the RV on Imoova</a><div class="s">These go fast. The company confirms by email.</div></div></li><li><div class="n">2</div><div class="sb"><div class="st">Book your flight</div><a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/travel/flights?q=Flights%20from%20YVR%20to%20SBN%20one%20way%20on%202027-04-01">See today's flight prices</a><div class="s">Wait for the RV confirmation before you buy.</div></div></li></ol><details class="bringbox"><summary>What to bring</summary><ul class="bring"><li>Driver&#x27;s licence (some companies want 2 years or more of driving)</li><li>A credit card with US$2,330 of room for the bond (held, then released)</li><li>Bedding and towels unless the listing includes them</li></ul></details><div id="more"></div><div class="tabs" role="tablist" data-hash="1" data-default="" aria-label="deal"><button role="tab" id="b-deal-overview" data-key="overview" aria-controls="p-deal-overview" aria-selected="true">Why this score</button><button role="tab" id="b-deal-itinerary" data-key="itinerary" aria-controls="p-deal-itinerary" aria-selected="false">Day by day</button><button role="tab" id="b-deal-costs" data-key="costs" aria-controls="p-deal-costs" aria-selected="false">Money</button><button role="tab" id="b-deal-details" data-key="details" aria-controls="p-deal-details" aria-selected="false">Fine print</button></div><section role="tabpanel" id="p-deal-overview" aria-labelledby="b-deal-overview"><h2>Why this score</h2><div class="card"><ul class="list"><li><span class="dot bad">&#10005;</span><span>About $320 a night all-in (RV, getting there or home, fuel, camping)</span></li><li><span class="dot ok">!</span><span>Pick-up is 130 days away: plans may change before then</span></li><li><span class="dot ok">!</span><span>8 nights for a ~3,400 km drive: enough, little spare time</span></li><li><span class="dot ok">!</span><span>Up to 10 more nights available at a higher rate</span></li><li><span class="dot ok">!</span><span>No route plan for this trip, so road conditions are only roughly checked</span></li><li><span class="dot good">&#10003;</span><span>Unlimited distance</span></li><li><span class="dot good">&#10003;</span><span>Sleeps 7</span></li></ul></div></section><section role="tabpanel" id="p-deal-itinerary" aria-labelledby="b-deal-itinerary"><div class="card empty">No ready-made itinerary for this route yet.<br>The deal details are still accurate.</div></section><section role="tabpanel" id="p-deal-costs" aria-labelledby="b-deal-costs"><h2>All-in estimate</h2><div class="card" data-cost='{&quot;rv&quot;:147.66,&quot;tl&quot;:265,&quot;th&quot;:455,&quot;fuel&quot;:1618.4,&quot;n&quot;:8,&quot;cpn&quot;:35.0,&quot;dc&quot;:&quot;free&quot;,&quot;dp&quot;:2,&quot;paid&quot;:{&quot;campgrounds&quot;:8,&quot;mix&quot;:4,&quot;free&quot;:2}}'><table><tr><td>The RV</td><td>$150</td></tr><tr><td>Flight there<div class="small">$260-460 each &times; <span class="ai" data-f="people">2 people</span>, typical for April</div></td><td><span class="ai" data-f="leg">$530-910</span></td></tr><tr><td>Fuel<div class="small">3,400 km at 28 L/100 km, about CA$1.70/L</div></td><td>$1,620</td></tr><tr><td>Sleeping<div class="small"><span class="ai" data-f="camphow">2 paid nights at about CA$35, 6 free</span></div></td><td><span class="ai" data-f="camp">$70</span></td></tr><tr class="total"><td>Total</td><td><span class="ai" data-f="allin">$2,370-2,750</span></td></tr></table><p class="small" style="margin:6px 0 0">Canadian dollars. How you sleep and how many people are travelling are in Settings (the gear on the deals list). Fares, fuel and campground prices are estimates for the season. Food and insurance extras not included.</p></div><h2>Paid to the company</h2><div class="card"><table><tr><td>RV: 8 nights &times; US$1.00</td><td>US$8</td></tr><tr><td>Booking fee</td><td>US$99</td></tr><tr class="sub"><td>You pay Imoova</td><td>US$107</td></tr></table><p class="small" style="margin:6px 0 0">In US dollars.</p></div><h2>Held on your card</h2><div class="card"><table><tr><td>Bond (held, released after return)</td><td>US$2,330</td></tr><tr><td>Holding deposit</td><td><span class=na>not listed</span></td></tr></table></div><h2>If you want more</h2><div class="card"><table><tr><td>Extra nights</td><td>US$249/night, up to 10</td></tr><tr><td>Extra distance</td><td><span class=na>not listed</span></td></tr></table></div></section><section role="tabpanel" id="p-deal-details" aria-labelledby="b-deal-details"><h2>Details</h2><div class="card"><dl><dt>Pick-up window, as listed</dt><dd>1 - 24 Apr 27</dd><dt>Vehicle</dt><dd>Comfort Family Select</dd><dt>Sleeps</dt><dd>7</dd><dt>How to book</dt><dd>online</dd><dt>Deal ID</dt><dd>RLC130667</dd></dl><p style="margin:14px 0 0"><a target="_blank" rel="noopener" href="https://www.imoova.com/relocations/usa/elkhart-to-seattle/RLC130667">Original listing on Imoova</a></p></div><h2>Not listed by Imoova</h2><div class="card"><div class="chips"><span class="pill">penalty terms</span><span class="pill">extra distance rate</span></div><p class="small" style="margin:8px 0 0">Ask before you book. This tool never guesses these.</p></div><p class="small">Driving times, distances and campgrounds are approximate starting points. Road closures, seasons, hours and reservations change: check before you go.</p></section><footer>RV Deal Hunter &middot; updated Nov 22, 2026 &middot; estimates, check before you go</footer></main><script>
+document.documentElement.classList.add('js');
+function pick(btn,push){var g=btn.closest('[role=tablist]');var tabs=g.querySelectorAll('[role=tab]');
+tabs.forEach(function(t){var on=t===btn;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;
+document.getElementById(t.getAttribute('aria-controls')).hidden=!on;});
+if(push&&g.dataset.hash){history.replaceState(null,'','#'+btn.dataset.key);}}
+document.querySelectorAll('[role=tablist]').forEach(function(g){var tabs=[].slice.call(g.querySelectorAll('[role=tab]'));
+tabs.forEach(function(t,i){t.addEventListener('click',function(){pick(t,true);});
+t.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+if(d){var n=tabs[(i+d+tabs.length)%tabs.length];n.focus();pick(n,true);}});});
+var want=(g.dataset.hash&&location.hash.slice(1))||g.dataset.default;var first=tabs.filter(function(t){return t.dataset.key===want;})[0]||tabs.filter(function(t){return t.dataset.key===g.dataset.default;})[0]||tabs[0];pick(first,false);});
+window.addEventListener('hashchange',function(){var b=document.querySelector('[data-hash="1"] [role=tab][data-key="'+location.hash.slice(1)+'"]');if(b){pick(b,false);}});
+document.querySelectorAll('[data-goto]').forEach(function(a){a.addEventListener('click',function(e){
+var b=document.querySelector('[role=tab][data-key="'+a.dataset.goto+'"]');if(b){e.preventDefault();pick(b,true);
+b.closest('.tabs').scrollIntoView({behavior:'smooth'});}});});
+
+var RV_LABELS={campgrounds:'Campgrounds every night',mix:'Mix',free:'Mostly free'};
+function rvGet(k,d){try{return localStorage.getItem('rvdh-'+k)||d;}catch(e){return d;}}
+function rvSet(k,v){try{localStorage.setItem('rvdh-'+k,v);}catch(e){}}
+function rvMoney(v){v=Math.max(0,v);return v>=100?'$'+(Math.round(v/10)*10).toLocaleString('en-US'):'$'+Math.round(v);}
+function rvRange(a,b){return Math.round(a/10)===Math.round(b/10)?rvMoney(a):rvMoney(a)+'-'+rvMoney(b).slice(1);}
+function rvApply(root){root=root||document;
+root.querySelectorAll('[data-cost]').forEach(function(box){var m;try{m=JSON.parse(box.getAttribute('data-cost'));}catch(e){return;}
+var c=rvGet('camp',m.dc);if(!(c in m.paid))c=m.dc;var p=parseInt(rvGet('people',m.dp),10)||m.dp;
+var paid=m.paid[c],cs=paid*m.cpn,lo=m.rv+m.tl*p+m.fuel+cs,hi=m.rv+m.th*p+m.fuel+cs,fr=m.n-paid;
+var out={allin:rvRange(lo,hi),pernight:rvRange(lo/m.n,hi/m.n),leg:rvRange(m.tl*p,m.th*p),legline:rvRange(m.tl*p,m.th*p)+' for '+p,
+people:p+(p===1?' person':' people'),style:RV_LABELS[c],camp:rvMoney(cs),
+camphow:paid?paid+' paid night'+(paid===1?'':'s')+' at about CA$'+Math.round(m.cpn)+(fr?', '+fr+' free':''):'All '+m.n+' nights free'};
+box.querySelectorAll('.ai').forEach(function(s){if(s.closest('[data-cost]')===box&&out[s.dataset.f]!==undefined)s.textContent=out[s.dataset.f];});});
+var rf=rvGet('route','');if(rf&&typeof pick==='function')root.querySelectorAll('[data-kind="'+rf+'"]').forEach(function(b){pick(b);});}
+(function(){var g=document.getElementById('gear'),pn=document.getElementById('settings');if(!g||!pn)return;
+function open(o){pn.hidden=!o;g.setAttribute('aria-expanded',o);}
+g.addEventListener('click',function(){open(pn.hidden);});
+document.getElementById('set-close').addEventListener('click',function(){open(false);g.focus();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!pn.hidden){open(false);g.focus();}});
+function sync(){pn.querySelectorAll('[data-pref]').forEach(function(b){b.setAttribute('aria-pressed',rvGet(b.dataset.pref,b.dataset.def)===b.dataset.val);});}
+pn.querySelectorAll('[data-pref]').forEach(function(b){b.addEventListener('click',function(){rvSet(b.dataset.pref,b.dataset.val);sync();rvApply(document);});});
+sync();})();
+rvApply(document);
+</script></body></html>
