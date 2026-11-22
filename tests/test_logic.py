@@ -140,10 +140,19 @@ def test_two_checks_per_site_per_day(runner):
 
 def test_slots():
     tz = ZoneInfo("America/Vancouver")
-    assert slot_for(datetime(2026, 7, 1, 7, 40, tzinfo=tz), CFG) == "check_am"
-    assert slot_for(datetime(2026, 7, 1, 13, 10, tzinfo=tz), CFG) == "check_pm"
-    assert slot_for(datetime(2026, 7, 1, 18, 5, tzinfo=tz), CFG) == "digest"
-    assert slot_for(datetime(2026, 7, 1, 3, 0, tzinfo=tz), CFG) is None
+    twice = {**CFG, "schedule": {**CFG["schedule"], "mode": "twice"}}
+    assert slot_for(datetime(2026, 7, 1, 7, 40, tzinfo=tz), twice) == "check_am"
+    assert slot_for(datetime(2026, 7, 1, 13, 10, tzinfo=tz), twice) == "check_pm"
+    assert slot_for(datetime(2026, 7, 1, 18, 5, tzinfo=tz), twice) == "digest"
+    assert slot_for(datetime(2026, 7, 1, 3, 0, tzinfo=tz), twice) is None
+
+
+def test_daily_slot():
+    tz = ZoneInfo("America/Vancouver")
+    daily = {**CFG, "schedule": {**CFG["schedule"], "mode": "daily"}}
+    assert slot_for(datetime(2026, 7, 1, 7, 10, tzinfo=tz), daily) == "daily"
+    assert slot_for(datetime(2026, 7, 1, 9, 40, tzinfo=tz), daily) == "daily"   # a late backup run still counts
+    assert slot_for(datetime(2026, 7, 1, 6, 50, tzinfo=tz), daily) is None
 
 
 def test_sunday_checkin_and_season_reminder(tmp_path, monkeypatch):

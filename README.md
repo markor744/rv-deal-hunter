@@ -1,18 +1,21 @@
 # RV Deal Hunter
 
-Checks RV relocation deal sites twice a day and texts you when a good deal shows up on your
+Checks RV relocation deal sites once a day and texts you only when a great new deal shows up on your
 routes. It runs by itself on GitHub (free), not on your Mac.
 
 ## What it does
 
-- **7am and 1pm Pacific:** checks the sites.
-  - Deals scoring **70 or more** are texted right away. These are the only texts you normally get.
-  - Deals scoring **40 to 69** are listed on the deals page, not texted.
-  - Anything lower is only logged.
-- **6pm:** a digest text, only if the daily cap held back a great deal that day.
+- **Every day at 7am Pacific:** checks the sites once.
+  - If there are **new deals scoring 70 or more**, you get **one** text: the deal itself, or a short
+    list of them with a link to the deals page.
+  - **No new great deal = no text.** Most winter days are silent.
+  - Deals scoring **40 to 69** are listed on the deals page, not texted. Anything lower is only logged.
 - **If a site fails 3 runs in a row:** a warning text (rare; it means the tool needs a fix).
 - **Never** texts about the same deal twice, and **never more than 5 texts a day** in total.
-- **Optional texts, off by default** (turn on under `texts:` in `config.yaml`): a 6pm digest of the
+- **Want it faster?** Set `mode: twice` under `schedule:` in `config.yaml` (and add the 1pm and 6pm
+  lines back to `.github/workflows/rv-deal-hunter.yml`): checks at 7am and 1pm, a text per great
+  deal right away, and a 6pm digest.
+- **Optional texts, off by default** (turn on under `texts:` in `config.yaml`): a 6pm digest of the (mode: twice only)
   40-69 deals (`good_deals_digest`), a Sunday "still running" text (`weekly_checkin`), and
   Feb 1 / Aug 15 season reminders (`season_reminders`). `site_warnings: false` silences the warning.
 - Each deal gets a phone-friendly **trip plan page** fitted to that deal's nights and distance cap.
@@ -272,7 +275,7 @@ What it found and fixed so far:
 
 ```
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest -q                 # 63 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
+.venv/bin/python -m pytest -q                 # 64 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
 .venv/bin/python -m rvdeals.main fixtures     # practice run; plan pages land in .practice/docs
 DRY_RUN=1 .venv/bin/python -m rvdeals.main check   # real sites, prints texts instead of sending
 ```

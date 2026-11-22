@@ -2,19 +2,14 @@ name: RV Deal Hunter
 
 on:
   schedule:
-    # Pacific time. Each slot has a backup run 30 minutes later in case GitHub drops one;
-    # the tool remembers which slots ran, so nothing happens twice.
+    # Pacific time. One check a day at 7am (config.yaml: schedule.mode: daily). The 7:37 and
+    # 9:07 runs are backups in case GitHub drops or delays one; the tool remembers the day's
+    # check ran, so nothing happens twice. For mode: twice, add 13:07/13:37 and 18:07/18:37 back.
     - cron: '7 7 * * *'
       timezone: "America/Vancouver"
     - cron: '37 7 * * *'
       timezone: "America/Vancouver"
-    - cron: '7 13 * * *'
-      timezone: "America/Vancouver"
-    - cron: '37 13 * * *'
-      timezone: "America/Vancouver"
-    - cron: '7 18 * * *'
-      timezone: "America/Vancouver"
-    - cron: '37 18 * * *'
+    - cron: '7 9 * * *'
       timezone: "America/Vancouver"
   workflow_dispatch:
     inputs:

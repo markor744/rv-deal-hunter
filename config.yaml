@@ -81,5 +81,9 @@ sources:
 
 schedule:
   timezone: America/Vancouver
+  # daily = one check a day at the first check hour (7am), then ONE text only if there are new
+  #         great deals (none = no text). twice = checks at both hours, a text per great deal right
+  #         away, and the 6pm digest. Keep the workflow's cron lines in step with this.
+  mode: daily
   check_hours: [7, 13]   # local hours for deal checks (must match the workflow file)
   digest_hour: 18

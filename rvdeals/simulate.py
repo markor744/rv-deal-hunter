@@ -170,9 +170,9 @@ def run(start: date, days: int, cfg: dict, seed: int = 7) -> Sim:
         clock["kind"] = kind
         return orig_text(self, body, kind, group)
 
-    def digest(items, base, today=None):
+    def digest(items, base, today=None, **kw):
         sim.digests.append((today, [(d.deal_id, d.pickup_to or d.pickup_from) for d, _ in items]))
-        return orig_digest(items, base, today)
+        return orig_digest(items, base, today, **kw)
     app.Runner.text, message.digest = text, digest
     env_before = {k: os.environ.get(k) for k in ("ALERT_TO", "ALERT_FRIENDS", "TWILIO_ACCOUNT_SID", "DRY_RUN")}
     os.environ.update({"ALERT_TO": ME, "TWILIO_ACCOUNT_SID": "AC" + "0" * 32, "ALERT_FRIENDS": ""})
@@ -382,6 +382,7 @@ def report(sim: Sim, results, cfg: dict) -> str:
         if label != "you":
             continue
         k = kind.split(" ")[0]
+        k = "alert" if k == "daily" else k     # a daily text with several great deals counts as alerts
         months[(at.year, at.month)][k] += 1
     for at, trig, r in sim.runs:
         months[(at.year, at.month)]["runs"] += 1
@@ -414,6 +415,7 @@ def all_texts_on(cfg: dict) -> dict:
     """A copy of the settings with every kind of text switched on, so every promise gets tested."""
     c = copy.deepcopy(cfg)
     c["texts"] = {k: True for k in ("good_deals_digest", "weekly_checkin", "season_reminders", "site_warnings")}
+    c["schedule"] = {**c["schedule"], "mode": "twice"}
     return c
 
 
@@ -431,7 +433,7 @@ def check_your_settings(sim: Sim, cfg: dict) -> list[tuple[str, bool, str]]:
         seen = sim.final_state["seen"]
         weak = [i for _, items in sim.digests for i, _ in items
                 if seen.get(i, {}).get("score", 0) < cfg["thresholds"]["text_now"]]
-        res.append(("Your settings: digests only carry great deals the daily cap held back", not weak,
+        res.append(("Your settings: multi-deal texts only carry great deals", not weak,
                     f"{len(sim.digests)} digests, non-great entries: {len(weak)}"))
     great = [k for k, v in sim.final_state["seen"].items() if v.get("score", 0) >= cfg["thresholds"]["text_now"]]
     in_digest = {i for _, items in sim.digests for i, _ in items}
@@ -440,7 +442,18 @@ def check_your_settings(sim: Sim, cfg: dict) -> list[tuple[str, bool, str]]:
             and not sim.final_state["seen"][k].get("twin_of_texted")]
     res.append(("Your settings: no great deal is lost", not lost, f"{len(great)} great deals, lost: {lost[:3]}"))
     days = {t[0].date() for t in mine}
-    other = {k: v for k, v in kinds.items() if k not in ("alert", "digest", "failure")}
+    if cfg["schedule"].get("mode") == "daily":
+        deal_texts = Counter(t[0].date() for t in mine if t[2].split(" ")[0] in ("alert", "daily", "digest"))
+        res.append(("Your settings: at most one deal text a day", max(deal_texts.values() or [0]) <= 1,
+                    f"busiest day: {max(deal_texts.values() or [0])} deal texts"))
+        great_days = {date.fromisoformat(v["first_seen"]) for v in sim.final_state["seen"].values()
+                      if v.get("score", 0) >= cfg["thresholds"]["text_now"]}
+        quiet = [d for d in deal_texts if d not in great_days]
+        res.append(("Your settings: no deal text on a day without a new great deal", not quiet,
+                    f"{len(deal_texts)} days with a deal text, {len(great_days)} days with a new great deal"))
+        ids = Counter(i for t in mine if t[2].startswith("alert ") for i in [t[2].split(" ", 1)[1]])
+        res.append(("Your settings: no deal is texted twice", all(c == 1 for c in ids.values()), f"{len(ids)} single alerts"))
+    other = {k: v for k, v in kinds.items() if k not in ("alert", "daily", "digest", "failure")}
     res.append(("Your settings: every text is about a deal (or a broken site)", not other,
                 f"texts on {len(days)} of {sim.days} days; {dict(kinds)}"))
     return res

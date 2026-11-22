@@ -108,13 +108,13 @@ def _short_when(d: Deal, today) -> str:
     return f"{a:%b} {a.day}" if a else "date ?"
 
 
-def digest(items: list[tuple[Deal, Score]], plans_base: str, today=None) -> str:
+def digest(items: list[tuple[Deal, Score]], plans_base: str, today=None, title: str = "RV deals digest") -> str:
     """One text for the 40-69 deals: compact lines, then one link to the page listing them all."""
     from datetime import date as _date
     today = today or _date.today()
     items = sorted(items, key=lambda x: -x[1].total)
     tail = f" All + plans: {plans_base.rstrip('/')}/"
-    msg = f"RV deals digest ({len(items)}):"
+    msg = f"{title} ({len(items)}):"
     shown = 0
     for d, s in items:
         when = _short_when(d, today)

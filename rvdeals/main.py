@@ -45,6 +45,7 @@ class Runner:
         self.fetcher = fetcher
         self.docs, self.log = Path(docs), Path(log)
         self.cap = cfg["limits"]["max_texts_per_day"]
+        self.batch = None   # a list while daily() collects the day's great deals into one text
 
     def on(self, name: str) -> bool:
         """A switch under texts: in config.yaml. Missing switches are on."""
@@ -150,6 +151,11 @@ class Runner:
         if t == "now" and twin in twins:   # same route and dates as a deal already texted (other vehicle)
             t = "digest"
             self._extra["twin_of_texted"] = True
+        if t == "now" and not self.state.was_texted(deal.deal_id) and self.batch is not None:
+            self.batch.append({"id": deal.deal_id, "deal": deal.to_dict(), "score": sc.total, "twin": twin,
+                               "_obj": (deal, sc, cost, leg), **self._extra})
+            self._remember(deal, sc, t, False)
+            return t
         if t == "now" and not self.state.was_texted(deal.deal_id):
             texted = self.text(message.alert(deal, sc, base, cost, leg), f"alert {deal.deal_id}", "alerts")
             if texted:
@@ -220,6 +226,50 @@ class Runner:
             return f"digest sent ({len(items)} deals, {len(notices)} notices)"
         return "digest not sent (kept for tomorrow)"
 
+    def daily(self) -> str:
+        """Daily mode: one check, then at most one text with the day's new great deals.
+        Great deals that could not be sent (cap, pause, Twilio error) wait for the next day."""
+        self.batch = []
+        try:
+            report = self.check()
+        finally:
+            batch, self.batch = self.batch, None
+        today = self.today.isoformat()
+        q = self.state.data["digest_queue"]
+        still_open = lambda x: (x["deal"].get("pickup_to") or x["deal"].get("pickup_from") or today) >= today
+        waiting = [x for x in q if "deal" in x and x.get("great") and not self.state.was_texted(x["id"]) and still_open(x)]
+        notices = [x["notice"] for x in q if "notice" in x]
+        great = batch + waiting
+        if not great and not notices:
+            self.state.data["digest_queue"] = []
+            return f"{json.dumps(report)} no new great deal, no text"
+        base = self.cfg["plans_base_url"]
+        if len(great) == 1 and "_obj" in great[0] and not notices:
+            d, sc, cost, leg = great[0]["_obj"]
+            body, kind = message.alert(d, sc, base, cost, leg), f"alert {d.deal_id}"
+        else:
+            items = []
+            for x in great:
+                d = _deal_from_dict(x["deal"])
+                d._allin_low = x.get("allin_low")
+                items.append((d, Score(total=x["score"])))
+            body = message.digest(items, base, self.today, title="RV DEALS") if items else ""
+            if notices:
+                body = message.ascii_only((body + " " if body else "") + " ".join(notices))[:message.MAX_CHARS]
+            kind = "daily"
+        if self.text(body, kind, "alerts"):
+            twins = self.state.data.setdefault("texted_twins", {})
+            for x in great:
+                if x["id"] in self.state.data["seen"]:
+                    self.state.data["seen"][x["id"]]["texted"] = True
+                if x.get("twin"):
+                    twins[x["twin"]] = today
+            self.state.data["digest_queue"] = []
+            return f"{json.dumps(report)} texted {len(great)} great deal(s), {len(notices)} notice(s)"
+        keep = [{k: v for k, v in x.items() if k != "_obj"} | {"great": True} for x in batch]
+        self.state.data["digest_queue"] = waiting + keep + [x for x in q if "notice" in x]
+        return f"{json.dumps(report)} text not sent; {len(great)} great deal(s) kept for tomorrow"
+
     def extras(self) -> list[str]:
         """Sunday check-in and season reminders, sent with the 6pm slot."""
         out = []
@@ -265,8 +315,14 @@ def _deal_from_dict(x: dict) -> Deal:
     return Deal(**kw)
 
 
+def daily_mode(cfg: dict) -> bool:
+    return cfg["schedule"].get("mode", "twice") == "daily"
+
+
 def slot_for(now: datetime, cfg: dict) -> str | None:
     h = now.hour
+    if daily_mode(cfg):   # one check a day, at the first check hour or any later run that day
+        return "daily" if h >= cfg["schedule"]["check_hours"][0] else None
     am, pm = cfg["schedule"]["check_hours"]
     dg = cfg["schedule"]["digest_hour"]
     if am <= h < pm:
@@ -285,6 +341,8 @@ def run_scheduled(runner: "Runner") -> str:
     if slot is None or state.slot_done(now.date(), slot):
         return f"nothing to do now ({now:%H:%M} {cfg['schedule']['timezone']}, slot {slot}, already done)"
     state.mark_slot(now.date(), slot)
+    if slot == "daily":
+        return f"{slot}: {runner.daily()} {runner.extras()}"
     if slot == "digest":
         return f"{slot}: {runner.digest()} {runner.extras()}"
     return f"{slot}: {json.dumps(runner.check())}"
@@ -330,7 +388,7 @@ def main(argv=None) -> int:
     if args.command == "scheduled":
         print(run_scheduled(runner))
     elif args.command == "check":
-        print(json.dumps(runner.check(), indent=1))
+        print(runner.daily() if daily_mode(cfg) else json.dumps(runner.check(), indent=1))
     elif args.command == "digest":
         print(runner.digest())
     state.save(now)
