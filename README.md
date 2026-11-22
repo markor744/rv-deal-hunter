@@ -6,14 +6,15 @@ routes. It runs by itself on GitHub (free), not on your Mac.
 ## What it does
 
 - **7am and 1pm Pacific:** checks the sites.
-  - Deals scoring **70 or more** are texted right away.
-  - Deals scoring **40 to 69** wait for the 6pm digest.
+  - Deals scoring **70 or more** are texted right away. These are the only texts you normally get.
+  - Deals scoring **40 to 69** are listed on the deals page, not texted.
   - Anything lower is only logged.
-- **6pm:** sends one digest text if anything is waiting.
-- **Sundays at 6pm:** a "still running" text.
-- **Feb 1 and Aug 15:** season reminders.
-- **If a site fails 3 runs in a row:** a warning text.
+- **6pm:** a digest text, only if the daily cap held back a great deal that day.
+- **If a site fails 3 runs in a row:** a warning text (rare; it means the tool needs a fix).
 - **Never** texts about the same deal twice, and **never more than 5 texts a day** in total.
+- **Optional texts, off by default** (turn on under `texts:` in `config.yaml`): a 6pm digest of the
+  40-69 deals (`good_deals_digest`), a Sunday "still running" text (`weekly_checkin`), and
+  Feb 1 / Aug 15 season reminders (`season_reminders`). `site_warnings: false` silences the warning.
 - Each deal gets a phone-friendly **trip plan page** fitted to that deal's nights and distance cap.
 
 ## What a text looks like
@@ -271,7 +272,7 @@ What it found and fixed so far:
 
 ```
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest -q                 # 60 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
+.venv/bin/python -m pytest -q                 # 63 tests on saved pages and two simulated years (tests/fixtures, from 2026-11-22)
 .venv/bin/python -m rvdeals.main fixtures     # practice run; plan pages land in .practice/docs
 DRY_RUN=1 .venv/bin/python -m rvdeals.main check   # real sites, prints texts instead of sending
 ```

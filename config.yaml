@@ -4,6 +4,14 @@
 # Master switch for texts. false = still checks and logs, but sends nothing.
 texts_enabled: true
 
+# Which texts to send. Great deals (score text_now or more) are always texted.
+texts:
+  good_deals_digest: false   # true = 6pm digest of good deals (40-69). false = they're only on the deals page
+                             # (great deals held back by the daily cap still come in a 6pm digest)
+  weekly_checkin: false      # true = Sunday "still running" text
+  season_reminders: false    # true = Feb 1 and Aug 15 season texts
+  site_warnings: true        # text you if a site fails 3 runs in a row (rare; means the tool needs a fix)
+
 # Web address of your trip-plan pages (GitHub Pages). Filled in during setup.
 plans_base_url: "https://markor744.github.io/rv-deal-hunter"
 

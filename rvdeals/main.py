@@ -46,6 +46,10 @@ class Runner:
         self.docs, self.log = Path(docs), Path(log)
         self.cap = cfg["limits"]["max_texts_per_day"]
 
+    def on(self, name: str) -> bool:
+        """A switch under texts: in config.yaml. Missing switches are on."""
+        return bool((self.cfg.get("texts") or {}).get(name, True))
+
     # ---------- texting with the hard cap ----------
     def recipients(self, group: str) -> list[tuple[str, str]]:
         """Who gets this kind of text. You get everything; friends get only what config allows.
@@ -140,18 +144,21 @@ class Runner:
                        "cost": cost.model(deal.nights) if cost else None,
                        "why": " · ".join(sc.flags[:3]).capitalize()}
         pages.write_plan(self.docs, deal, sc, self.today, self.cfg)     # every matching deal: Skipped shows the weak ones
-        texted = False
+        texted, overflow = False, False
         twin = f"{deal.company}|{deal.origin}|{deal.destination}|{deal.pickup_from}"
         twins = self.state.data.setdefault("texted_twins", {})
         if t == "now" and twin in twins:   # same route and dates as a deal already texted (other vehicle)
             t = "digest"
+            self._extra["twin_of_texted"] = True
         if t == "now" and not self.state.was_texted(deal.deal_id):
             texted = self.text(message.alert(deal, sc, base, cost, leg), f"alert {deal.deal_id}", "alerts")
             if texted:
                 twins[twin] = self.today.isoformat()
             else:   # cap reached or paused: keep it for the digest so it is not lost
-                t = "digest"
-        if t == "digest":
+                t, overflow = "digest", True
+        # With good_deals_digest off, only great deals the cap held back go in the digest;
+        # 40-69 deals are still on the deals page.
+        if t == "digest" and (overflow or self.on("good_deals_digest")):
             self.state.data["digest_queue"].append({"id": deal.deal_id, "deal": deal.to_dict(),
                                                     "score": sc.total, **self._extra})
         self._remember(deal, sc, t, texted)
@@ -179,7 +186,7 @@ class Runner:
                 n = self.state.record_result(name, False)
                 report[name] = f"FAILED ({n} in a row): {type(e).__name__}: {e}"
                 traceback.print_exc()
-                if n >= FAIL_ALERT_AFTER and not self.state.data["failure_alerted"].get(name):
+                if n >= FAIL_ALERT_AFTER and self.on("site_warnings") and not self.state.data["failure_alerted"].get(name):
                     if self.text(f"RV Deal Hunter: {name} has failed {n} runs in a row. The site may have "
                                  f"changed. Open the GitHub Actions log to see why.", f"failure {name}"):
                         self.state.data["failure_alerted"][name] = True
@@ -222,7 +229,7 @@ class Runner:
                   (8, 15): "RV Deal Hunter: fall southbound season starts now. Watch for Vancouver, "
                            "Calgary and Seattle relocations heading south."}
         # Each reminder is due on its day or, if that run was missed or the cap was full, the next 3 days.
-        for (m, day_), body in season.items():
+        for (m, day_), body in (season.items() if self.on("season_reminders") else []):
             due = date(d.year, m, day_)
             key = f"{d.year}-{m:02d}-{day_:02d}"
             if due <= d <= due + timedelta(days=3) and not self.state.data["season_sent"].get(key):
@@ -232,7 +239,7 @@ class Runner:
         # Weekly check-in: Sundays, or the first evening after a Sunday that was missed.
         last = self.state.data.get("last_checkin")
         overdue = last is not None and (d - date.fromisoformat(last)).days >= 7
-        if (d.weekday() == 6 or overdue) and last != d.isoformat():
+        if self.on("weekly_checkin") and (d.weekday() == 6 or overdue) and last != d.isoformat():
             week = [(d - timedelta(days=i)).isoformat() for i in range(7)]
             texts = sum(self.state.data["texts"].get(x, 0) for x in week)
             failing = [k for k, v in self.state.data["failures"].items() if v]

@@ -1,6 +1,6 @@
 # RV Deal Hunter: year simulation
 
-Simulated 2026-11-22 to 2027-11-21 (365 days), 2013 runs, 383 texts recorded (none sent). **25 of 25 checks passed.**
+Simulated 2026-11-22 to 2027-11-21 (365 days), 2013 runs, 172 texts recorded (none sent). **30 of 30 checks passed.**
 
 ## Checks
 
@@ -31,27 +31,32 @@ Simulated 2026-11-22 to 2027-11-21 (365 days), 2013 runs, 383 texts recorded (no
 | PASS | Scores spread out instead of bunching around one number | 332 matching deals, spread (std dev) 25, 13% between 60 and 75, range 15-100 |
 | PASS | Winter road warnings show in January and not in July |  |
 | PASS | Trips cost more in summer and holidays than in January | {1: 1331, 3: 1461, 7: 1584, 12: 1441} |
+| PASS | Your settings: no Sunday check-in texts | check-ins: 0 |
+| PASS | Your settings: no season reminder texts | reminders: 0 |
+| PASS | Your settings: digests only carry great deals the daily cap held back | 2 digests, non-great entries: 0 |
+| PASS | Your settings: no great deal is lost | 99 great deals, lost: [] |
+| PASS | Your settings: every text is about a deal (or a broken site) | texts on 85 of 365 days; {'alert': 94, 'digest': 1, 'failure': 1} |
 
 ## Month by month (texts to you)
 
 | Month | New matching deals | Alerts | Digests | Check-ins | Reminders | Warnings | Runs |
 |---|---|---|---|---|---|---|---|
-| Nov 2026 | 11 | 2 | 4 | 2 | 0 | 0 | 47 |
-| Dec 2026 | 9 | 1 | 1 | 4 | 0 | 0 | 176 |
-| Jan 2027 | 9 | 3 | 3 | 5 | 0 | 0 | 172 |
-| Feb 2027 | 34 | 11 | 7 | 4 | 1 | 0 | 148 |
-| Mar 2027 | 37 | 10 | 16 | 4 | 0 | 0 | 163 |
-| Apr 2027 | 35 | 9 | 10 | 4 | 0 | 0 | 162 |
-| May 2027 | 52 | 13 | 11 | 5 | 0 | 0 | 166 |
-| Jun 2027 | 10 | 1 | 3 | 4 | 0 | 1 | 172 |
-| Jul 2027 | 8 | 1 | 1 | 4 | 0 | 0 | 177 |
-| Aug 2027 | 32 | 11 | 12 | 5 | 1 | 0 | 172 |
-| Sep 2027 | 38 | 13 | 10 | 4 | 0 | 0 | 165 |
-| Oct 2027 | 31 | 10 | 7 | 5 | 0 | 0 | 175 |
-| Nov 2027 | 26 | 9 | 4 | 3 | 0 | 0 | 118 |
+| Nov 2026 | 11 | 2 | 0 | 0 | 0 | 0 | 47 |
+| Dec 2026 | 9 | 1 | 0 | 0 | 0 | 0 | 176 |
+| Jan 2027 | 9 | 3 | 0 | 0 | 0 | 0 | 172 |
+| Feb 2027 | 34 | 11 | 0 | 0 | 0 | 0 | 148 |
+| Mar 2027 | 37 | 10 | 0 | 0 | 0 | 0 | 163 |
+| Apr 2027 | 35 | 9 | 0 | 0 | 0 | 0 | 162 |
+| May 2027 | 52 | 13 | 1 | 0 | 0 | 0 | 166 |
+| Jun 2027 | 10 | 1 | 0 | 0 | 0 | 1 | 172 |
+| Jul 2027 | 8 | 1 | 0 | 0 | 0 | 0 | 177 |
+| Aug 2027 | 32 | 11 | 0 | 0 | 0 | 0 | 172 |
+| Sep 2027 | 38 | 13 | 0 | 0 | 0 | 0 | 165 |
+| Oct 2027 | 31 | 10 | 0 | 0 | 0 | 0 | 175 |
+| Nov 2027 | 26 | 9 | 0 | 0 | 0 | 0 | 118 |
 
 ## Sample texts
 
-- Nov 23 08:04: `RV DEAL 100/100 Great: Vancouver > Seattle. Pick up Dec 1-3, 12 nights. All-in about $830-930 (RV $640, bus/ferry home $40-90, fuel+camping $110). Watch: $2,330 bond. Details + book: https://YOUR-NAME.github.io/rv-deal-hunter/p/SIM-imoova-2.html`
-- Nov 26 07:36: `RV DEAL 100/100 Great: Vancouver > Seattle. Pick up Jan 10-12, 3 nights. All-in about $88-190 (RV $3, bus/ferry home $40-90, fuel+camping $5). Watch: $1,000 bond. Details + book: https://YOUR-NAME.github.io/rv-deal-hunter/p/SIM-imoova-5.html`
-- Nov 25 18:50: `RV deals digest (1): 45 Vancouver>Calgary Nov 30, 4n ~$830 all-in All + plans: https://YOUR-NAME.github.io/rv-deal-hunter/`
+- Nov 23 08:04: `RV DEAL 100/100 Great: Vancouver > Seattle. Pick up Dec 1-3, 12 nights. All-in about $830-930 (RV $640, bus/ferry home $40-90, fuel+camping $110). Watch: $2,330 bond. Details + book: https://markor744.github.io/rv-deal-hunter/p/SIM-imoova-2.html`
+- Nov 26 07:36: `RV DEAL 100/100 Great: Vancouver > Seattle. Pick up Jan 10-12, 3 nights. All-in about $88-190 (RV $3, bus/ferry home $40-90, fuel+camping $5). Watch: $1,000 bond. Details + book: https://markor744.github.io/rv-deal-hunter/p/SIM-imoova-5.html`
+- May 10 18:37: `RV deals digest (4): 93 LA>Vancouver May 28, 10n ~$990 all-in; 93 LA>Vancouver May 29, 10n ~$990 all-in; 93 LA>Vancouver May 30, 10n ~$990 all-in; 93 LA>Vancouver May 31, 10n ~$990 all-in All + plans: https://markor744.github.io/rv-deal-hunter/`

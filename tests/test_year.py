@@ -14,8 +14,16 @@ CFG = yaml.safe_load((Path(__file__).parent.parent / "config.yaml").read_text())
 
 @pytest.mark.parametrize("start,seed", [(date(2026, 11, 22), 7), (date(2027, 6, 15), 2)])
 def test_a_whole_year(start, seed):
+    full = simulate.all_texts_on(CFG)
+    sim = simulate.run(start, 365, full, seed)
+    failed = [(name, detail) for name, ok, detail in simulate.check(sim, full) if not ok]
+    assert not failed
+
+
+@pytest.mark.parametrize("start,seed", [(date(2026, 11, 22), 7), (date(2027, 6, 15), 2)])
+def test_a_whole_year_with_your_settings(start, seed):
     sim = simulate.run(start, 365, CFG, seed)
-    failed = [(name, detail) for name, ok, detail in simulate.check(sim, CFG) if not ok]
+    failed = [(name, detail) for name, ok, detail in simulate.check_your_settings(sim, CFG) if not ok]
     assert not failed
 
 

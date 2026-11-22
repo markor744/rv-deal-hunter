@@ -149,9 +149,17 @@ def test_slots():
 def test_sunday_checkin_and_season_reminder(tmp_path, monkeypatch):
     monkeypatch.setenv("DRY_RUN", "1")
     sunday_feb1 = datetime(2026, 2, 1, 18, 5, tzinfo=ZoneInfo("America/Vancouver"))   # a Sunday
-    r = Runner(CFG, State(tmp_path / "s.json"), sunday_feb1, None, tmp_path / "d", tmp_path / "l")
+    all_on = {**CFG, "texts": {"weekly_checkin": True, "season_reminders": True}}
+    r = Runner(all_on, State(tmp_path / "s.json"), sunday_feb1, None, tmp_path / "d", tmp_path / "l")
     assert r.extras() == ["season reminder sent", "weekly check-in sent"]
     assert r.extras() == []          # not twice
+
+
+def test_your_settings_send_no_checkin_or_reminder(tmp_path, monkeypatch):
+    monkeypatch.setenv("DRY_RUN", "1")
+    sunday_feb1 = datetime(2026, 2, 1, 18, 5, tzinfo=ZoneInfo("America/Vancouver"))
+    r = Runner(CFG, State(tmp_path / "s.json"), sunday_feb1, None, tmp_path / "d", tmp_path / "l")
+    assert r.extras() == []
 
 
 @pytest.mark.parametrize("o,d,nights", [("Los Angeles", "Vancouver", 9), ("Las Vegas", "Seattle", 7),

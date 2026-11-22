@@ -19,6 +19,7 @@ Then it checks every promise the tool makes and writes a report.
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
 import random
@@ -409,13 +410,52 @@ def report(sim: Sim, results, cfg: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def all_texts_on(cfg: dict) -> dict:
+    """A copy of the settings with every kind of text switched on, so every promise gets tested."""
+    c = copy.deepcopy(cfg)
+    c["texts"] = {k: True for k in ("good_deals_digest", "weekly_checkin", "season_reminders", "site_warnings")}
+    return c
+
+
+def check_your_settings(sim: Sim, cfg: dict) -> list[tuple[str, bool, str]]:
+    """Checks for a year run with the real config.yaml switches."""
+    sw = cfg.get("texts") or {}
+    mine = [t for t in sim.texts if t[1] == "you"]
+    kinds = Counter(t[2].split(" ")[0] for t in mine)
+    res = []
+    if not sw.get("weekly_checkin", True):
+        res.append(("Your settings: no Sunday check-in texts", kinds["weekly"] == 0, f"check-ins: {kinds['weekly']}"))
+    if not sw.get("season_reminders", True):
+        res.append(("Your settings: no season reminder texts", kinds["season"] == 0, f"reminders: {kinds['season']}"))
+    if not sw.get("good_deals_digest", True):
+        seen = sim.final_state["seen"]
+        weak = [i for _, items in sim.digests for i, _ in items
+                if seen.get(i, {}).get("score", 0) < cfg["thresholds"]["text_now"]]
+        res.append(("Your settings: digests only carry great deals the daily cap held back", not weak,
+                    f"{len(sim.digests)} digests, non-great entries: {len(weak)}"))
+    great = [k for k, v in sim.final_state["seen"].items() if v.get("score", 0) >= cfg["thresholds"]["text_now"]]
+    in_digest = {i for _, items in sim.digests for i, _ in items}
+    # A twin (another vehicle, same company, route and dates as a deal already texted) is not lost.
+    lost = [k for k in great if not sim.final_state["seen"][k].get("texted") and k not in in_digest
+            and not sim.final_state["seen"][k].get("twin_of_texted")]
+    res.append(("Your settings: no great deal is lost", not lost, f"{len(great)} great deals, lost: {lost[:3]}"))
+    days = {t[0].date() for t in mine}
+    other = {k: v for k, v in kinds.items() if k not in ("alert", "digest", "failure")}
+    res.append(("Your settings: every text is about a deal (or a broken site)", not other,
+                f"texts on {len(days)} of {sim.days} days; {dict(kinds)}"))
+    return res
+
+
 def main(cfg: dict | None = None, start: date | None = None, days: int = 365, seed: int = 7) -> int:
     cfg = cfg or app.load_config()
     start = start or date.today()
-    sim = run(start, days, cfg, seed)
-    results = check(sim, cfg)
+    full = all_texts_on(cfg)
+    sim = run(start, days, full, seed)            # every kind of text on: tests every promise
+    results = check(sim, full)
+    yours = run(start, days, cfg, seed)           # the real config.yaml: what you would get
+    results += check_your_settings(yours, cfg)
     REPORT.parent.mkdir(exist_ok=True)
-    REPORT.write_text(report(sim, results, cfg))
+    REPORT.write_text(report(yours, results, cfg))
     for name, passed, detail in results:
         print(f"{'PASS' if passed else 'FAIL'}  {name}  ({detail})")
     print(f"report: {REPORT}")
