@@ -1,0 +1,77 @@
+# RV Deal Hunter settings. Edit on GitHub (pencil icon), then "Commit changes".
+# Lines starting with # are notes and are ignored.
+
+# Master switch for texts. false = still checks and logs, but sends nothing.
+texts_enabled: true
+
+# Web address of your trip-plan pages (GitHub Pages). Filled in during setup.
+plans_base_url: "https://markor744.github.io/rv-deal-hunter"
+
+# Friends: their numbers go in the ALERT_FRIENDS GitHub Secret (never in this file).
+# You always get every text. Friends get only the kinds listed here.
+friends:
+  receive: [alerts, digest, season]   # remove any you don't want them to get; [] = none
+  max_friends: 5                      # extra numbers are ignored (protects your Twilio bill)
+  us_friends: false                   # true only after your Twilio number is A2P 10DLC registered
+  welcome_text: "Hi! A friend added you to RV Deal Hunter: texts about cheap one-way RV relocation deals (often $1/night) on West Coast routes, at most 5 a day. Reply STOP anytime to opt out."
+
+routes:
+  # A deal matches if it ENDS in one of these...
+  end_in: [Vancouver, Abbotsford, Victoria, Bellingham, Seattle]
+  # ...or STARTS in one of these.
+  start_in: [Vancouver, Abbotsford, Seattle]
+  # Deals starting here get a bonus.
+  priority_origins: [Los Angeles, San Diego, San Francisco, Las Vegas, Phoenix, Calgary, Edmonton]
+
+thresholds:
+  text_now: 70        # score at or above this: text right away
+  digest: 40          # score from this up to text_now-1: goes in the 6pm digest
+                      # below digest: logged only
+
+limits:
+  max_texts_per_day: 5          # hard cap on ALL texts (alerts, digest, check-ins, warnings)
+  max_detail_pages_per_run: 15  # extra deal pages opened per site per run (politeness)
+  seconds_between_requests: 3
+
+# Getting to the pick-up or home from the drop-off, and the "all-in" estimate.
+travel:
+  home_airport: YVR
+  travellers: 2             # people flying or taking the bus (flights are per person)
+  route_first: scenic       # which route option a plan shows first: scenic or fast
+  fare_overrides: {}        # e.g. {LAX: [150, 280]} to set your own one-way fare range in CAD
+  season_fare: {}           # e.g. {7: 1.4} to say July flights cost 40% more than usual
+costs:
+  rv_litres_per_100km: 28   # typical Class C motorhome; vans use about 15
+  fuel_cad_per_litre: 1.70  # rough average across BC and the US
+  camping_style: free            # campgrounds = pay every night; mix = about half free; free = free most nights
+  campground_cad_per_night: auto # auto = by season ($60 peak summer, $35 winter); or a number; 0 if you camp free
+
+scoring:
+  usd_to_cad: 1.38              # rough rate for comparing prices; edit when it moves a lot
+  pickup_min_days: 7            # best pickup window starts this many days out...
+  pickup_max_days: 120          # ...and ends this many days out
+  min_sleeps: 2
+  # Points for each part (they add up to 100). See README "How the score works".
+  weights:
+    value: 50            # all-in cost per night: RV, fee, flight or bus, fuel after refund, camping
+    pace: 15             # nights vs the days the drive needs at about 5 hours a day
+    distance: 10         # included distance vs the route
+    timing: 10           # can you realistically pick it up
+    season: 10           # snow, passes or blizzards on the route in those months
+    sleeps: 5
+    priority_origin: 5   # bonus; the total is capped at 100
+  value_full_night_cad: 80     # all-in per night at or below this = full value points
+  value_zero_night_cad: 300    # at or above this = zero value points
+
+# Which sites to check. Set enabled: false to stop checking one.
+sources:
+  imoova: {enabled: true}
+  canadream: {enabled: true}
+  canadream_elmonte: {enabled: true}   # CanaDream + El Monte RV Canada-to-US program
+  fraserway: {enabled: true}           # phone booking only: 1-800-661-2441
+  cruise_america: {enabled: false}     # OFF: its terms of use forbid robots and data gathering
+
+schedule:
+  timezone: America/Vancouver
+  check_hours: [7, 13]   # local hours for deal checks (must match the workflow file)
+  digest_hour: 18

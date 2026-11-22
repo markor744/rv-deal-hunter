@@ -1,0 +1,83 @@
+name: RV Deal Hunter
+
+on:
+  schedule:
+    # Pacific time. Each slot has a backup run 30 minutes later in case GitHub drops one;
+    # the tool remembers which slots ran, so nothing happens twice.
+    - cron: '7 7 * * *'
+      timezone: "America/Vancouver"
+    - cron: '37 7 * * *'
+      timezone: "America/Vancouver"
+    - cron: '7 13 * * *'
+      timezone: "America/Vancouver"
+    - cron: '37 13 * * *'
+      timezone: "America/Vancouver"
+    - cron: '7 18 * * *'
+      timezone: "America/Vancouver"
+    - cron: '37 18 * * *'
+      timezone: "America/Vancouver"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "What to run"
+        type: choice
+        default: check
+        options: [check, digest, test-sms, welcome, fixtures, simulate, status, scheduled]
+
+permissions:
+  contents: write   # save memory and plan pages
+  pages: write      # publish the plan pages
+  id-token: write   # required by actions/deploy-pages
+
+concurrency:
+  group: rv-deal-hunter
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        run: python -m pytest -q
+      - name: Run
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_API_KEY_SID: ${{ secrets.TWILIO_API_KEY_SID }}
+          TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          TWILIO_MESSAGING_SERVICE_SID: ${{ secrets.TWILIO_MESSAGING_SERVICE_SID }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+          ALERT_FRIENDS: ${{ secrets.ALERT_FRIENDS }}
+        run: python -m rvdeals.main ${{ github.event_name == 'schedule' && 'scheduled' || inputs.command }}
+      - name: Save memory and plan pages
+        if: always()
+        run: |
+          git config user.name "rv-deal-hunter-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state docs
+          git diff --cached --quiet && exit 0
+          git commit -m "Update deals and plans"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          exit 1
+      # Pages is set to publish from GitHub Actions: pushes made with GITHUB_TOKEN do not
+      # trigger a "deploy from branch" Pages build, so the new pages are deployed here.
+      - name: Upload plan pages
+        if: always()
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
+      - name: Publish plan pages
+        if: always()
+        id: deployment
+        uses: actions/deploy-pages@v5

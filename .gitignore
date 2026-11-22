@@ -1,0 +1,10 @@
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.practice/
+*.pyc
+.DS_Store
+.simulation/
