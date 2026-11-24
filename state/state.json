@@ -13,7 +13,7 @@
   "imoova": 0
  },
  "last_checkin": null,
- "last_run": "2026-11-23T19:49:21-07:00",
+ "last_run": "2026-11-24T16:26:52-07:00",
  "season_sent": {},
  "seen": {
   "CD-east-to-west-spring-special": {
@@ -87,6 +87,42 @@
    "tier": "digest",
    "when": "Pick up Mar 1 to Apr 24",
    "why": "Costs ~$192 a night all-in \u00b7 winter roads"
+  },
+  "CD-whitehorse-up-relocation": {
+   "allin_high": 4453.172,
+   "allin_low": 4053.172,
+   "company": "CanaDream",
+   "cost": {
+    "cpn": 35.0,
+    "dc": "free",
+    "dp": 2,
+    "fuel": 879.17,
+    "n": 21,
+    "paid": {
+     "campgrounds": 21,
+     "free": 5,
+     "mix": 11
+    },
+    "rv": 2499.0,
+    "th": 450,
+    "tl": 250
+   },
+   "currency": "CAD (assumed: prices on CanaDream's Canadian site)",
+   "destination": "Whitehorse",
+   "first_seen": "2026-11-24",
+   "last_day": "2027-04-20",
+   "leg": "Flight YXY to YVR",
+   "leg_cost": "$250-450",
+   "nights": 21,
+   "origin": "Vancouver / Calgary",
+   "pickup": "pick up from 15 April 2027 1:00pm - 4:00pm, return by 11 May 2027 10:00am",
+   "rate": 119.0,
+   "route": "Vancouver / Calgary to Whitehorse",
+   "score": 68,
+   "texted": false,
+   "tier": "digest",
+   "when": "Pick up Apr 15 to Apr 20",
+   "why": "Costs ~$205 a night all-in"
   },
   "CDEM-vancouver-los-angeles-2026-11-30": {
    "allin_high": 1562.56,
@@ -713,10 +749,19 @@
    "canadream_elmonte": 1,
    "fraserway": 1,
    "imoova": 1
+  },
+  "2026-11-24": {
+   "canadream": 1,
+   "canadream_elmonte": 1,
+   "fraserway": 1,
+   "imoova": 1
   }
  },
  "slots_done": {
   "2026-11-23": [
+   "daily"
+  ],
+  "2026-11-24": [
    "daily"
   ]
  },
